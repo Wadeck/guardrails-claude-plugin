@@ -1,0 +1,4 @@
+node_modules/
+.claude/logs/
+*.log
+.claude/guardrails.secrets

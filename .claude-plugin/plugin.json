@@ -1,0 +1,8 @@
+{
+  "name": "guardrails",
+  "description": "Per-project guardrails for destructive commands and secret leakage prevention",
+  "version": "1.15.1",
+  "author": {
+    "name": "Wadeck Follonier"
+  }
+}

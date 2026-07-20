@@ -1,0 +1,27 @@
+{
+  "categories": {
+    "git-stash":          "deny",
+    "git-reset":          "ask",
+    "git-push":           "ask",
+    "git-commit":         "allow",
+    "git-clean":          "deny",
+    "git-branch-delete":  "deny",
+    "rm":                 "ask",
+    "kill":               "allow",
+    "fleet-config-write": "ask",
+    "chmod":              "allow",
+    "docker-rm":          "deny",
+    "drop-db":            "deny",
+    "format-disk":        "deny"
+  },
+  "protected_files": [
+    { "glob": "**/*.pem",         "decision": "deny" },
+    { "glob": "**/*.key",         "decision": "deny" },
+    { "glob": ".env*",            "decision": "ask"  },
+    { "glob": "src/config/**",    "decision": "ask"  }
+  ],
+  "secrets": {
+    "file": ".claude/guardrails.secrets",
+    "redirect_message": "Do not use raw credentials. Use the project CLI tooling instead (e.g. `jira`, `gh`, `aws sso`)."
+  }
+}
