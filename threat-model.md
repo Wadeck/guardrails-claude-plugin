@@ -4,7 +4,7 @@
 
 guardrails runs as a `PreToolUse` hook with a **wildcard matcher** (matches every tool call,
 including built-in Bash/Edit/Write/NotebookEdit and all `mcp__*` MCP tools). The script's
-`isWriteCapableTool()` helper filters non-write tools (Read, Glob, Grep, etc.) early — only
+`isWriteCapableTool()` helper filters non-write tools (Read, Glob, Grep, etc.) early - only
 write-capable tools enter the security-checking pipeline.
 
 The threat model is: **an agent (main or sub-agent) makes a mistake or is manipulated via
@@ -13,18 +13,18 @@ prompt injection and issues a destructive or sensitive command without the user 
 This is not a security boundary against a determined adversary with full shell access - it is
 a safety net against accidental or injected actions.
 
-## Critical Claude Code behavior — `ask` is silently auto-approved under `.claude/`
+## Critical Claude Code behavior - `ask` is silently auto-approved under `.claude/`
 
 **Validated empirically 2026-06-21 across 8 controlled tests.** Claude Code does NOT emit a
 `PermissionRequest` event for Write/Edit tool calls targeting any file under the project's
 `.claude/` directory. A PreToolUse hook returning `permissionDecision: "ask"` for such paths
-is silently auto-approved — no dialog, no prompt, the write proceeds.
+is silently auto-approved - no dialog, no prompt, the write proceeds.
 
 `deny` and `allow` decisions ARE respected for `.claude/` paths. Only `ask` is broken.
 
 **Consequence enforced in v3-v5:** every rule that targets a path under `.claude/` defaults to
-`deny` instead of `ask`. The five self-protection rules (memory-write, guardrails-config-write,
-fleet-config-write, settings-write, secrets-file-write) plus `protected_files` user rules
+`deny` instead of `ask`. The four self-protection rules (memory-write, guardrails-config-write,
+settings-write, secrets-file-write) plus `protected_files` user rules
 under `.claude/` (which are upgraded ask→deny in `checkProtectedFiles`) all enforce this.
 
 The README "Notes for agents" section documents this caveat for future maintainers.
@@ -38,12 +38,12 @@ The README "Notes for agents" section documents this caveat for future maintaine
 | `git-push` | deny | Publishes to remote - irreversible visibility |
 | `git-push-force` | deny | Can permanently delete remote history; includes `--mirror` (overwrites all remote refs unconditionally, equivalent to `--force` across all refs) |
 | `git-commit` | ask | Creates history; user should confirm intent |
-| `git-clone` | deny | Clones a remote repository — can plant malicious files into `.claude/hooks/`, `.claude/skills/`, or `.claude/commands/` if the destination is inside the project's Claude config directory; also covers `git submodule add URL DEST` and `git subtree add --prefix=DEST URL REF`; path extractor fires on the destination operand |
+| `git-clone` | deny | Clones a remote repository - can plant malicious files into `.claude/hooks/`, `.claude/skills/`, or `.claude/commands/` if the destination is inside the project's Claude config directory; also covers `git submodule add URL DEST` and `git subtree add --prefix=DEST URL REF`; path extractor fires on the destination operand |
 | `git-clean` | deny | Deletes untracked files permanently; also covers `git filter-branch`/`git filter-repo` (history rewrite across all refs) |
 | `git-restore` | deny | Discards working-tree changes with no undo |
 | `git-revert` | deny | Rewrites effective file state |
 | `git-branch-delete` | deny | Can lose commits reachable only from that branch |
-| `rm` | deny | Permanent file deletion (includes `shred`, `unlink` (POSIX single-file deletion), `find -exec rm`, `find -execdir rm` with absolute or bare paths, `find -delete`, `env -i rm` / `env --ignore-environment rm` — env prefix absorbs arbitrary flags before `rm`; `xargs rm` and `xargs unlink`) |
+| `rm` | deny | Permanent file deletion (includes `shred`, `unlink` (POSIX single-file deletion), `find -exec rm`, `find -execdir rm` with absolute or bare paths, `find -delete`, `env -i rm` / `env --ignore-environment rm` - env prefix absorbs arbitrary flags before `rm`; `xargs rm` and `xargs unlink`) |
 | `kill` | ask | Terminates processes; numeric (`kill -9`), signal-name (`kill -TERM`, `-SIGTERM`), and word forms covered |
 | `chmod` | deny | Security exposure if permissions broadened unintentionally |
 | `docker-rm` | deny | Destroys containers, images, volumes |
@@ -56,12 +56,12 @@ The README "Notes for agents" section documents this caveat for future maintaine
 | `firewall` | deny | Flushes or disables network filtering (flags like `-v`, `-t table` before operative flag are handled; `nft delete table/chain/rule` covered alongside `nft flush`) |
 | `log-clear` | deny | Erases audit trail (`rm *.log` uses command-position anchor to avoid false positives from `--rm build.log` in tool flag arguments) |
 | `sudo-shell` | ask | Opens a root shell with no further audit |
-| `env-hijack` | deny | Injects libraries or hijacks executable PATH (`export` searched anywhere in assignment list — `export DUMMY=1 LD_PRELOAD=...` multi-assignment form is caught; `declare`/`typeset` requires `-x` flag since without it the variable is not exported to child processes; env VAR=val cmd; LD_PRELOAD/LD_LIBRARY_PATH/DYLD_INSERT_LIBRARIES and PATH; PATH checked per-segment so dangerous dirs in any position are caught; outer-quoted values stripped; `${HOME}` curly-brace form handled alongside `$HOME`; PATH=., /dev/shm, /tmp, $HOME/, /home/ variants) |
+| `env-hijack` | deny | Injects libraries or hijacks executable PATH (`export` searched anywhere in assignment list - `export DUMMY=1 LD_PRELOAD=...` multi-assignment form is caught; `declare`/`typeset` requires `-x` flag since without it the variable is not exported to child processes; env VAR=val cmd; LD_PRELOAD/LD_LIBRARY_PATH/DYLD_INSERT_LIBRARIES and PATH; PATH checked per-segment so dangerous dirs in any position are caught; outer-quoted values stripped; `${HOME}` curly-brace form handled alongside `$HOME`; PATH=., /dev/shm, /tmp, $HOME/, /home/ variants) |
 | `python` | deny | Python not installed on this machine |
 
 ## Path-based protections
 
-Path-level rules fire on every write-capable tool — Bash, Edit, Write, NotebookEdit, and any
+Path-level rules fire on every write-capable tool - Bash, Edit, Write, NotebookEdit, and any
 MCP tool whose name matches the write-capable verb-list (`isWriteCapableTool`):
 
 | Rule | Default | What it catches |
@@ -71,25 +71,23 @@ MCP tool whose name matches the write-capable verb-list (`isWriteCapableTool`):
 | `memory-write` | **deny** | Writes to `.claude/memory/` |
 | `settings-write` | **deny** | Writes to `.claude/settings.json`, `settings.local.json`, `CLAUDE.md`, `hooks/**`, `skills/**`, `commands/**`, or `.claude/` itself |
 | `secrets-file-write` | **deny** | Writes to the configured secrets file or any `@`-linked file |
-| `secrets-file-access` | deny | Bash commands that reference a secrets file (cat, source, grep, …) |
-| `fleet-config-write` | **deny** | Writes to `.claude/w-fleet.json` |
-
-All five `.claude/`-scoped defaults are `deny` because Claude Code silently auto-approves `ask`
+| `secrets-file-access` | deny | Bash commands that reference a secrets file (cat, source, grep, ...) |
+All four `.claude/`-scoped defaults are `deny` because Claude Code silently auto-approves `ask`
 for those paths (see "Critical Claude Code behavior" above). Users can opt back in to `ask`
 explicitly in `guardrails.json` if they want a prompt for paths outside `.claude/`.
 
-**Symlink defense:** the four most security-critical checkers (settings-write, memory-write,
-guardrails-config-write, fleet-config-write) test paths against BOTH the symlink-resolved form
+**Symlink defense:** the three most security-critical checkers (settings-write, memory-write,
+guardrails-config-write) test paths against BOTH the symlink-resolved form
 AND the literal form. This prevents a two-step attack where an attacker plants a symlink
 inside `.claude/` pointing outside, then writes through the symlink.
 
 **Bash write-path extraction** covers redirections (`>`, `>>`), `tee` (including output
-process-substitution form `> >(tee FILE)` — trailing `)` stripped from the token), `sponge`
+process-substitution form `> >(tee FILE)` - trailing `)` stripped from the token), `sponge`
 (moreutils atomic stdin-to-file writer, trailing `)` also stripped), `rsync` (last non-flag
-token = destination), `cp`, `mv` (all tokens extracted — covers multi-source form `cp src1 src2 dst`),
+token = destination), `cp`, `mv` (all tokens extracted - covers multi-source form `cp src1 src2 dst`),
 `curl -o`, `wget -O`, `rm`/`rmdir`, `shred`, `sed -i` (including `-e`/`-f` script-flag forms),
 `perl -pi`, `awk -i inplace` (two-pass extractor: handles script-before-`-i`, script-after-`-i`, `-f script.awk`
-external script, and stdin-as-script forms — if only one positional non-flag exists and no `-f`
+external script, and stdin-as-script forms - if only one positional non-flag exists and no `-f`
 was seen, it is treated as the target file rather than the inline script), `yq -i`,
 `openssl -out`, `gpg --output`, `dd of=`, `tar -C`/`--directory`/`--directory=DIR`/`--one-top-level`/`--one-top-level=DIR` (all forms),
 `unzip -d`, `install` (`-t DIR`, `--target-directory DIR`, and `--target-directory=DIR` all
@@ -103,7 +101,7 @@ as additional write targets), `sponge` (`-a`/`--append` flag consumed before pat
 `cp`/`mv` (all non-flag tokens). Path-based checks fire for any of these
 targets. Shell globs in extracted paths (e.g. `.claude/settings*`) are matched conservatively:
 if the pre-wildcard prefix is a prefix of a protected entry, the write is blocked.
-Shell character-class globs (`[.json]`, `[sg]`) are also detected — `[` is included in the glob
+Shell character-class globs (`[.json]`, `[sg]`) are also detected - `[` is included in the glob
 character set alongside `*` and `?`.
 
 The `protected_files` array in `guardrails.json` lets projects add arbitrary path-glob rules
@@ -204,10 +202,10 @@ fixed because fixing them would require a full shell parser or cause unacceptabl
 - Write/Edit tool targeting OS-critical paths (`/etc/passwd`, `C:\Windows\System32`) - BV-NEW-06, BV-NEW-07
 - Shell quoting tricks that split the keyword (`ev''al`, `e\val`) - not detected by `/\beval\b/`
   because bash splice/escape is invisible to regex; these would error in most shells anyway
-- `cmd /c "rm -rf foo"` on Windows — `"` is not in the rm separator set; `rm.exe` is not in
+- `cmd /c "rm -rf foo"` on Windows - `"` is not in the rm separator set; `rm.exe` is not in
   Windows system PATH so the practical impact is near-zero (Git Bash environments use POSIX rm
   via shim, which IS caught at command-position)
-- URL-safe base64 fingerprints — `buildBase64Fingerprints` uses standard alphabet (`+`/`/`).
+- URL-safe base64 fingerprints - `buildBase64Fingerprints` uses standard alphabet (`+`/`/`).
   A hand-crafted URL-safe encoded secret would not be fingerprinted. Low exploitability:
   requires deliberate encoding choice by the agent.
 
@@ -238,10 +236,10 @@ and `NotebookEdit` do not have. There is nothing to match for non-Bash tools.
 `secrets-not-gitignored` and `secrets-leak` always emit `deny` and cannot be overridden to
 `ask` or `allow` via `guardrails.json`. This is intentional:
 
-- **`secrets-not-gitignored`** — if the secrets file is not gitignored, every Bash command is a
+- **`secrets-not-gitignored`** - if the secrets file is not gitignored, every Bash command is a
   potential commit-time leak vector. There is no safe partial mode; the misconfiguration must be
   fixed before any command runs.
-- **`secrets-leak`** — a command that contains a live secret value must never execute. There is
+- **`secrets-leak`** - a command that contains a live secret value must never execute. There is
   no legitimate use case for an agent intentionally embedding a secret in a shell command.
 
 Both rules participate in the unified accumulator (matches are collected, most restrictive wins)

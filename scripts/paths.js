@@ -57,7 +57,7 @@ function normPath(p, cwd) {
 
 // Like normPath but does NOT follow symlinks. Used as a second comparison axis
 // when checking .claude/-scoped writes: if the literal path is under .claude/
-// we must deny even if realpath resolves outside (symlink attack — see
+// we must deny even if realpath resolves outside (symlink attack - see
 // symlink-defense.js). The attacker would otherwise plant a symlink inside
 // .claude/ pointing outside, then write through it to bypass the prefix check.
 function normPathLiteral(p, cwd) {
@@ -86,7 +86,7 @@ function extractBashWritePaths(command, projectDir) {
 
   for (const m of command.matchAll(/\btee(?:\s+(?:-a|--append))*\s+((?:[^\s|&;'"]+\s*)+)/g)) {
     // Strip trailing shell metacharacters that cannot be part of a bare path token:
-    // `> >(tee file)` captures "file)" — the closing paren must be dropped.
+    // `> >(tee file)` captures "file)" - the closing paren must be dropped.
     for (const p of m[1].trim().split(/\s+/)) push(p.replace(/[)>}]+$/, ''));
   }
   for (const m of command.matchAll(/\btee(?:\s+(?:-a|--append))*\s+"([^"]+)"/g)) push(m[1]);
@@ -100,8 +100,8 @@ function extractBashWritePaths(command, projectDir) {
   for (const m of command.matchAll(/\bsponge(?:\s+(?:-a|--append))*\s+"([^"]+)"/g)) push(m[1]);
   for (const m of command.matchAll(/\bsponge(?:\s+(?:-a|--append))*\s+'([^']+)'/g)) push(m[1]);
 
-  // rsync src dst — last non-flag, non-option-value token is the destination.
-  // rsync -av src dst, rsync --checksum src dst, rsync -r src/ dst/ — same heuristic.
+  // rsync src dst - last non-flag, non-option-value token is the destination.
+  // rsync -av src dst, rsync --checksum src dst, rsync -r src/ dst/ - same heuristic.
   // Also extract --backup-dir=DIR (directory where backup copies are written).
   for (const m of command.matchAll(/\brsync\b([^|&;]*)/g)) {
     const rawTokens = [...m[1].matchAll(/"([^"]+)"|'([^']+)'|([^\s|&;'"]+)/g)]
@@ -120,9 +120,9 @@ function extractBashWritePaths(command, projectDir) {
     }
   }
 
-  // git clone URL [DEST] — the optional second non-flag arg is the destination directory.
-  // git submodule add URL DEST — last non-flag is the destination path.
-  // git subtree add --prefix=DEST URL REF — extract --prefix= value.
+  // git clone URL [DEST] - the optional second non-flag arg is the destination directory.
+  // git submodule add URL DEST - last non-flag is the destination path.
+  // git subtree add --prefix=DEST URL REF - extract --prefix= value.
   for (const m of command.matchAll(/\bgit\b[^|&;]*\bclone\b([^|&;]*)/g)) {
     const tokens = [...m[1].matchAll(/"([^"]+)"|'([^']+)'|([^\s|&;'"]+)/g)]
       .map(t => t[1] ?? t[2] ?? t[3])
@@ -148,7 +148,7 @@ function extractBashWritePaths(command, projectDir) {
       .map(t => t[1] ?? t[2] ?? t[3])
       .filter(t => t && !t.startsWith('-'));
     // Push all non-flag tokens: for two-arg form this is [src, dst];
-    // for multi-source it is [src1, src2, ..., dst]. All become candidates —
+    // for multi-source it is [src1, src2, ..., dst]. All become candidates -
     // path-based checkers normalise and compare, so false src entries are harmless.
     for (const t of tokens) push(t);
   }
@@ -156,22 +156,22 @@ function extractBashWritePaths(command, projectDir) {
   for (const m of command.matchAll(/\bcurl\b[^|&;]*?\s(?:-o|--output)[= ]([^\s|&;'"]+)/g)) push(m[1]);
   for (const m of command.matchAll(/\bcurl\b[^|&;]*?\s(?:-o|--output)[= ]"([^"]+)"/g)) push(m[1]);
   for (const m of command.matchAll(/\bcurl\b[^|&;]*?\s(?:-o|--output)[= ]'([^']+)'/g)) push(m[1]);
-  // curl -oFILE (concatenated, no separator) — valid curl syntax.
+  // curl -oFILE (concatenated, no separator) - valid curl syntax.
   for (const m of command.matchAll(/\bcurl\b[^|&;]*?\s-o([^-\s][^\s|&;'"]*)/g)) push(m[1]);
-  // curl --output-dir DIR (curl 7.73+) — sets download directory for all outputs.
+  // curl --output-dir DIR (curl 7.73+) - sets download directory for all outputs.
   for (const m of command.matchAll(/\bcurl\b[^|&;]*?\s--output-dir[= ]([^\s|&;'"]+)/g)) push(m[1]);
   for (const m of command.matchAll(/\bcurl\b[^|&;]*?\s--output-dir[= ]"([^"]+)"/g)) push(m[1]);
 
   for (const m of command.matchAll(/\bwget\b[^|&;]*?\s(?:-O|--output-document)[= ]([^\s|&;'"]+)/g)) push(m[1]);
   for (const m of command.matchAll(/\bwget\b[^|&;]*?\s(?:-O|--output-document)[= ]"([^"]+)"/g)) push(m[1]);
   for (const m of command.matchAll(/\bwget\b[^|&;]*?\s(?:-O|--output-document)[= ]'([^']+)'/g)) push(m[1]);
-  // wget -OFILE (concatenated, no separator) — valid wget syntax.
+  // wget -OFILE (concatenated, no separator) - valid wget syntax.
   for (const m of command.matchAll(/\bwget\b[^|&;]*?\s-O([^-\s][^\s|&;'"]*)/g)) push(m[1]);
   // wget -P DIR / --directory-prefix=DIR / --directory-prefix DIR (sets download directory).
   for (const m of command.matchAll(/\bwget\b[^|&;]*?\s-P\s+([^\s|&;'"]+)/g)) push(m[1]);
   for (const m of command.matchAll(/\bwget\b[^|&;]*?\s--directory-prefix[= ]([^\s|&;'"]+)/g)) push(m[1]);
 
-  // rm/rmdir — enables path-based checks on deletions too
+  // rm/rmdir - enables path-based checks on deletions too
   for (const m of command.matchAll(/\brm(?:dir)?\b([^|&;]*)/g)) {
     for (const tok of m[1].matchAll(/"([^"]+)"|'([^']+)'|([^\s|&;'"]+)/g)) {
       const p = tok[1] ?? tok[2] ?? tok[3];
@@ -180,7 +180,7 @@ function extractBashWritePaths(command, projectDir) {
   }
   // Windows deletion: del / erase, Remove-Item, ri (PowerShell alias),
   // rmdir-like rd /s. Same command-position requirement as rm to avoid false
-  // positives — `ri` would otherwise match Unix flag bundles like `grep -ri`.
+  // positives - `ri` would otherwise match Unix flag bundles like `grep -ri`.
   // The lookahead-style anchor: start of string OR after a shell separator.
   const winDelRe = /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:del|erase|Remove-Item|ri|rd)\b([^|&;]*)/g;
   // case-insensitive variant for Remove-Item / Erase / RD
@@ -199,7 +199,7 @@ function extractBashWritePaths(command, projectDir) {
   for (const m of command.matchAll(winDelRe)) handle(m);
   for (const m of command.matchAll(winDelReI)) handle(m);
 
-  // sed -i / sed --in-place — extract file arguments.
+  // sed -i / sed --in-place - extract file arguments.
   // Forms:
   //   sed -i SCRIPT FILE [FILE...]                 (script as first non-flag)
   //   sed -i -e SCRIPT [-e SCRIPT...] FILE...     (scripts via -e, files at end)
@@ -228,7 +228,7 @@ function extractBashWritePaths(command, projectDir) {
     for (const f of fileArgs) push(f);
   }
 
-  // perl -i / perl -pi / perl -ni — in-place edit. Files come after the script.
+  // perl -i / perl -pi / perl -ni - in-place edit. Files come after the script.
   for (const m of command.matchAll(/\bperl\b([^|&;]*)/g)) {
     const segment = m[1];
     if (!/(?:^|\s)-\w*i/.test(segment)) continue;
@@ -296,7 +296,7 @@ function extractBashWritePaths(command, projectDir) {
     }
   }
 
-  // patch -o FILE / patch --output=FILE — writes patched result to a new file.
+  // patch -o FILE / patch --output=FILE - writes patched result to a new file.
   for (const m of command.matchAll(/\bpatch\b[^|&;]*?\s(?:-o|--output)[= ]([^\s|&;'"]+)/g)) push(m[1]);
   for (const m of command.matchAll(/\bpatch\b[^|&;]*?\s(?:-o|--output)[= ]"([^"]+)"/g)) push(m[1]);
   for (const m of command.matchAll(/\bpatch\b[^|&;]*?\s(?:-o|--output)[= ]'([^']+)'/g)) push(m[1]);
@@ -305,7 +305,7 @@ function extractBashWritePaths(command, projectDir) {
   for (const m of command.matchAll(/\bssh-keygen\b[^|&;]*?\s-f\s+([^\s|&;'"]+)/g)) push(m[1]);
   for (const m of command.matchAll(/\bssh-keygen\b[^|&;]*?\s-f\s+"([^"]+)"/g)) push(m[1]);
 
-  // awk / gawk / mawk -i inplace 'script' FILE — GNU awk 4.1+ in-place mode.
+  // awk / gawk / mawk -i inplace 'script' FILE - GNU awk 4.1+ in-place mode.
   // The token "inplace" is the value of -i, then a script, then file(s).
   for (const m of command.matchAll(/\b(?:gawk|mawk|nawk|awk)\b([^|&;]*)/g)) {
     const segment = m[1];
@@ -351,7 +351,7 @@ function extractBashWritePaths(command, projectDir) {
       // Inline script: one non-flag is the script token. It's either the FIRST pre-inplace
       // non-flag (script before -i), or the FIRST post-inplace non-flag (script after -i).
       // Exception: if there is exactly ONE non-flag total, awk is reading its program from
-      // stdin — the single token is a target file, not an inline script.
+      // stdin - the single token is a target file, not an inline script.
       const all = [...preNonFlags, ...postNonFlags];
       if (all.length === 1) {
         push(all[0]); // stdin-as-script: lone token is the file
@@ -361,7 +361,7 @@ function extractBashWritePaths(command, projectDir) {
     }
   }
 
-  // yq -i 'expr' FILE — YAML in-place edit (mikefarah/yq).
+  // yq -i 'expr' FILE - YAML in-place edit (mikefarah/yq).
   for (const m of command.matchAll(/\byq\b([^|&;]*)/g)) {
     const segment = m[1];
     if (!/(?:^|\s)-i(?:\b|\s)/.test(segment)) continue;
@@ -371,7 +371,7 @@ function extractBashWritePaths(command, projectDir) {
     for (const f of nonFlags.slice(1)) push(f);
   }
 
-  // unlink FILE — POSIX single-file deletion (no flags). Same command-position anchor as rm.
+  // unlink FILE - POSIX single-file deletion (no flags). Same command-position anchor as rm.
   for (const m of command.matchAll(/(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:sudo\s+)?unlink\b([^|&;]*)/g)) {
     const tokens = [...m[1].matchAll(/"([^"]+)"|'([^']+)'|(\S+)/g)].map(t => t[1] ?? t[2] ?? t[3]);
     for (const tok of tokens) {
@@ -379,7 +379,7 @@ function extractBashWritePaths(command, projectDir) {
     }
   }
 
-  // shred [-u] [-z] [options] FILE... — secure overwrite/delete. Same command-position
+  // shred [-u] [-z] [options] FILE... - secure overwrite/delete. Same command-position
   // anchor as rm to avoid false positives. Extract file operands (skip flags).
   for (const m of command.matchAll(/(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:sudo\s+)?shred\b([^|&;]*)/g)) {
     const tokens = [...m[1].matchAll(/"([^"]+)"|'([^']+)'|(\S+)/g)].map(t => t[1] ?? t[2] ?? t[3]);
@@ -388,7 +388,7 @@ function extractBashWritePaths(command, projectDir) {
     }
   }
 
-  // truncate -s N FILE / truncate --size=N FILE — truncates file to given size.
+  // truncate -s N FILE / truncate --size=N FILE - truncates file to given size.
   // Dangerous when N=0 (zeroes the file). Extract the file operand.
   for (const m of command.matchAll(/\btruncate\b([^|&;]*)/g)) {
     const segment = m[1];
@@ -414,7 +414,7 @@ function extractBashWritePaths(command, projectDir) {
 // Best-effort extraction of all target file paths from a tool_input.
 // Returns an array (possibly empty) so callers can iterate uniformly.
 // Built-in tools (Edit/Write/NotebookEdit) have known shapes; MCP tools use
-// a variety of shapes — single (path/file_path/target_path), pair-style
+// a variety of shapes - single (path/file_path/target_path), pair-style
 // (src+dst, source+destination), or array (paths/files).
 function getTargetPaths(event) {
   const ti = event?.tool_input ?? {};
@@ -444,7 +444,7 @@ function getTargetPaths(event) {
   for (const k of ['destination', 'dst', 'target', 'to', 'new_path', 'link_target', 'dir', 'directory']) {
     if (typeof ti[k] === 'string' && ti[k]) out.push(ti[k]);
   }
-  // Array shapes — accept both strings and {path,...}/{file_path,...} objects.
+  // Array shapes - accept both strings and {path,...}/{file_path,...} objects.
   for (const k of ['paths', 'files', 'targets']) {
     if (!Array.isArray(ti[k])) continue;
     for (const elem of ti[k]) {
@@ -476,7 +476,7 @@ function isWriteCapableTool(toolName) {
   if (!toolName.startsWith('mcp__')) return false;
   // Verbs covering all destructive/mutating operations seen across MCP servers.
   // 'run'/'exec' are intentionally omitted to avoid screening read-only tools
-  // named e.g. mcp__shell__exec_query — can be added if a specific server needs it.
+  // named e.g. mcp__shell__exec_query - can be added if a specific server needs it.
   return /(?:^|_)(?:write|edit|create|update|append|delete|remove|unlink|destroy|drop|clear|erase|wipe|purge|move|copy|patch|put|save|replace|truncate|rename|rewrite|insert|overwrite|upsert|set|upload|push|sync|commit|transfer|export|generate|store|dump|emit|persist|publish|apply)(?:_|$)/i.test(toolName);
 }
 

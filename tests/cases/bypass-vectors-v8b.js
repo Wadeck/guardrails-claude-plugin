@@ -1,6 +1,6 @@
 'use strict';
 
-// V8b — findings confirmed by subprocess V8
+// V8b - findings confirmed by subprocess V8
 
 const CWD = 'C:\\Workspace\\myproject';
 function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cwd: CWD }; }
@@ -9,7 +9,7 @@ module.exports = [
 
   // -------------------------------------------------------------------------
   // BV-V8-04: .claude/commands/ not in checkSettingsWrite protectedRels.
-  // Claude Code per-project slash commands live in .claude/commands/ — writing
+  // Claude Code per-project slash commands live in .claude/commands/ - writing
   // there plants a persistent backdoor (arbitrary tool sequences in markdown).
   // -------------------------------------------------------------------------
   {
@@ -37,7 +37,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V8-09: stripEchoArgs bypass — printf/echo "dangerous" | sh erases the
+  // BV-V8-09: stripEchoArgs bypass - printf/echo "dangerous" | sh erases the
   // dangerous content from the stripped command used for category matching.
   // printf "rm -rf /tmp\n" | sh → stripped = " | sh" → rm not detected.
   // -------------------------------------------------------------------------

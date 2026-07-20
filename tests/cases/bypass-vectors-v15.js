@@ -8,7 +8,7 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V15-01: rsync write bypass — not in extractBashWritePaths or any category.
+  // BV-V15-01: rsync write bypass - not in extractBashWritePaths or any category.
   // rsync is a standard file-copy tool; rsync src dst overwrites dst with no warning.
   // -------------------------------------------------------------------------
   {
@@ -51,7 +51,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V15-03: printf multi-arg false positive — second quoted arg not stripped.
+  // BV-V15-03: printf multi-arg false positive - second quoted arg not stripped.
   // stripEchoArgs only strips the first quoted argument immediately after printf.
   // After stripping '%s\n', the result is `printf  'git stash'` → git-stash fires.
   // Fix: strip ALL consecutive literal quoted args following echo/printf.

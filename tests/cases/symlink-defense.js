@@ -1,6 +1,6 @@
 'use strict';
 
-// Symlink two-step bypass — primary defense is the ln category (deny by default).
+// Symlink two-step bypass - primary defense is the ln category (deny by default).
 // Secondary defense: if a Write/Edit tool targets a path that LITERALLY appears
 // to be under .claude/, block it regardless of where the symlink resolves to.
 // safeRealpath resolves symlinks before comparison, which can let an attacker
@@ -13,7 +13,7 @@
 const CWD = 'C:\\Workspace\\myproject';
 
 module.exports = [
-  // The literal path is under .claude/ — must be denied by settings-write
+  // The literal path is under .claude/ - must be denied by settings-write
   // regardless of how realpath would resolve it.
   {
     description: 'Write to literal .claude/hooks/x (path checked before realpath) → deny',

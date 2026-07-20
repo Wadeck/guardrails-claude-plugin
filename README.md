@@ -9,10 +9,10 @@ Per-project guardrails for Claude Code. Intercepts every Bash command before exe
 The plugin registers a `PreToolUse` hook on `Bash`, `Edit`, `Write`, and `NotebookEdit`. Before any tool runs, the hook:
 
 1. Reads `.claude/guardrails.json` from the project root (`cwd`). If absent, built-in category defaults still apply.
-2. Runs **all** applicable checkers unconditionally — path-based rules (cross-home, guardrails-config, memory, secrets-file, protected_files) for every tool, plus category rules and secret checks for Bash.
+2. Runs **all** applicable checkers unconditionally - path-based rules (cross-home, guardrails-config, memory, secrets-file, protected_files) for every tool, plus category rules and secret checks for Bash.
 3. Collects every match into a pool. Most restrictive decision wins (`deny` > `ask` > `allow`). Multiple `ask`-level matches are shown together in a single confirmation dialog.
 4. Emits exactly one `permissionDecision` (`deny`, `ask`, or `allow`) covering all triggered rules.
-5. Verifies that the secrets file is listed in `.gitignore` — if not, **all Bash commands are blocked** until fixed (this is a hard `deny` that dominates all other matches).
+5. Verifies that the secrets file is listed in `.gitignore` - if not, **all Bash commands are blocked** until fixed (this is a hard `deny` that dominates all other matches).
 
 Logs are written to `.claude/logs/guardrails/guardrails-YYYY-MM-DD.log` inside the project. Secret values are never logged; only key names are.
 
@@ -131,14 +131,14 @@ If a category is not listed in `guardrails.json`, its built-in default decision 
 | `git-push-force` | `git push --force` / `git push -f` |
 | `git-restore` | `git restore` (discards working-tree changes) |
 | `git-revert` | `git revert` |
-| `eval` | `eval`, `exec $…`, `source /tmp/`, `. /tmp/` |
-| `cron-at` | `crontab -`, `at`, `echo … cron`, `/etc/cron.*`, `/var/spool/cron/` |
-| `systemctl-stop` | `systemctl stop/disable/mask/kill`, `service … stop` |
-| `firewall` | `iptables -F`, `nft flush`, `ufw disable`, `netsh advfirewall … off` |
+| `eval` | `eval`, `exec $...`, `source /tmp/`, `. /tmp/` |
+| `cron-at` | `crontab -`, `at`, `echo ... cron`, `/etc/cron.*`, `/var/spool/cron/` |
+| `systemctl-stop` | `systemctl stop/disable/mask/kill`, `service ... stop` |
+| `firewall` | `iptables -F`, `nft flush`, `ufw disable`, `netsh advfirewall ... off` |
 | `log-clear` | Truncate or remove `/var/log/` files, `Clear-EventLog`, `wevtutil cl` |
 | `sudo-shell` | `sudo bash/sh/zsh`, `sudo -s`, `sudo -i`, `sudo vim/less/awk/perl/python` |
-| `env-hijack` | `export LD_PRELOAD=`, `LD_LIBRARY_PATH=`, `PATH=…/tmp`, `DYLD_INSERT_LIBRARIES=` |
-| `python` | `python`, `python3`, `pip`, `conda`, `poetry`, `virtualenv`, `pyenv`, `pytest`, `uv pip/run/…` |
+| `env-hijack` | `export LD_PRELOAD=`, `LD_LIBRARY_PATH=`, `PATH=.../tmp`, `DYLD_INSERT_LIBRARIES=` |
+| `python` | `python`, `python3`, `pip`, `conda`, `poetry`, `virtualenv`, `pyenv`, `pytest`, `uv pip/run/...` |
 | `ln` | `ln`, `ln -s`, `ln --symbolic`, `mklink` (Windows), `New-Item -ItemType SymbolicLink/HardLink/Junction` (PowerShell). Default `deny` because symlinks can be used to bypass path-prefix checks. |
 
 ### Protected files
@@ -166,7 +166,7 @@ Patterns are relative to the project root and use the following glob semantics:
 
 **Precedence when multiple rules match:** the most restrictive decision wins (`deny` > `ask` > `allow`).
 
-The check applies to all write tools (`Edit`, `Write`, `NotebookEdit`) and to write paths extracted from `Bash` commands (redirections, `tee`, `cp`, `mv`, `curl -o`, `wget -O`, `rm`/`rmdir`). `rm` targets are included, so a `deny` rule also protects against deletion — on top of the `rm` category. Paths outside the project root are not evaluated against these rules.
+The check applies to all write tools (`Edit`, `Write`, `NotebookEdit`) and to write paths extracted from `Bash` commands (redirections, `tee`, `cp`, `mv`, `curl -o`, `wget -O`, `rm`/`rmdir`). `rm` targets are included, so a `deny` rule also protects against deletion - on top of the `rm` category. Paths outside the project root are not evaluated against these rules.
 
 ---
 
@@ -215,11 +215,11 @@ Retention: 30 days, max 100 files. Pruning runs automatically on each log write.
 
 ### Claude Code silently ignores `ask` for paths under `.claude/`
 
-**Critical security caveat.** Claude Code does **not** emit a `PermissionRequest` event for Write/Edit tool calls targeting any file under the project's `.claude/` directory. The hook's `permissionDecision: "ask"` is silently auto-approved — no dialog, no prompt, no `PermissionRequest` hook fired. This was empirically validated on 2026-06-21 with 7 controlled tests across `.claude/memory/`, `.claude/docs/`, and `.claude/random/` subdirectories. The same `ask` on paths outside `.claude/` (e.g. `tmp/`, project root) correctly prompts.
+**Critical security caveat.** Claude Code does **not** emit a `PermissionRequest` event for Write/Edit tool calls targeting any file under the project's `.claude/` directory. The hook's `permissionDecision: "ask"` is silently auto-approved - no dialog, no prompt, no `PermissionRequest` hook fired. This was empirically validated on 2026-06-21 with 7 controlled tests across `.claude/memory/`, `.claude/docs/`, and `.claude/random/` subdirectories. The same `ask` on paths outside `.claude/` (e.g. `tmp/`, project root) correctly prompts.
 
 `deny` and `allow` decisions ARE respected for `.claude/` paths. Only `ask` is broken in this scope.
 
-**Consequence:** rules that protect `.claude/`-scoped writes (`memory-write`, `guardrails-config-write`, `fleet-config-write`, `secrets-file-write`, and any `protected_files` glob targeting `.claude/`) **must default to `deny`** — `ask` provides no protection. To allow ad-hoc writes, the user must explicitly set the rule to `allow` in `guardrails.json`.
+**Consequence:** rules that protect `.claude/`-scoped writes (`memory-write`, `guardrails-config-write`, `fleet-config-write`, `secrets-file-write`, and any `protected_files` glob targeting `.claude/`) **must default to `deny`** - `ask` provides no protection. To allow ad-hoc writes, the user must explicitly set the rule to `allow` in `guardrails.json`.
 - Secret values are matched as **literal substrings** and as **base64 fingerprints** (all byte-alignment offsets). Values are never written to logs - only key names appear.
 - Linked secret files (`@path`) support `env` and `properties` formats, auto-detected by extension or overridden with `[tag]`.
 - The `.gitignore` check walks up to the git root if the project dir itself has no `.git`.

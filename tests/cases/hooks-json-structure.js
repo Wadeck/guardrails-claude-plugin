@@ -33,7 +33,7 @@ function validate() {
   }
 }
 
-// Run validation at module load — if it throws, the test runner aborts loading
+// Run validation at module load - if it throws, the test runner aborts loading
 // this file, marking it failed. The empty cases array means "no per-case
 // assertions", but the load-time throw still surfaces in run-tests output.
 validate();

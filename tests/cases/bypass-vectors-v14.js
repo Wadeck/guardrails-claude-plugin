@@ -8,7 +8,7 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V14-01: PATH outer-quote bypass — quoted assignment hides the path.
+  // BV-V14-01: PATH outer-quote bypass - quoted assignment hides the path.
   // The PATH function captures `"/tmp/evil:$PATH"` (with outer quote), then
   // splits on `:` → first segment is `"/tmp/evil` which fails WRITABLE regex.
   // Fix: strip leading/trailing quotes from the captured value before splitting.
@@ -46,7 +46,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V14-03: find -exec /bin/rm — absolute path not matched.
+  // BV-V14-03: find -exec /bin/rm - absolute path not matched.
   // Pattern `\\?rm\b` requires rm at start of the -exec argument.
   // /bin/rm places /bin/ before rm; regex engine can't match.
   // Fix: add `(?:[^\s|&;]*/)?` optional prefix before rm in the pattern.
@@ -63,7 +63,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V14-04: find -delete builtin — no rm keyword involved.
+  // BV-V14-04: find -delete builtin - no rm keyword involved.
   // -------------------------------------------------------------------------
   {
     description: 'BV-V14-04a: find .claude -name "*.json" -delete → deny',
@@ -77,7 +77,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V14-05: Function pattern ignores stripEchoArgs — false positive.
+  // BV-V14-05: Function pattern ignores stripEchoArgs - false positive.
   // PATH function receives original command, not stripped, so an echo message
   // mentioning PATH=/tmp/evil incorrectly triggers env-hijack deny.
   // Fix: pass testCmd to function patterns (same stripping as RegExp patterns).
@@ -115,7 +115,7 @@ module.exports = [
   // With `"git-push": "allow"` in config, `git push origin :main` bypasses
   // git-branch-delete (which requires --delete or -d/-D).
   // Fix: add colon-refspec form to git-branch-delete patterns.
-  // This test uses default config (no allow override) — git-push fires, which
+  // This test uses default config (no allow override) - git-push fires, which
   // is already deny. The real config-interaction gap is tested implicitly;
   // adding the pattern to git-branch-delete is correctness, not just safety.
   // -------------------------------------------------------------------------

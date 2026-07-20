@@ -11,7 +11,7 @@ function bash(command) {
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V8-01: git category false positives — patterns match inside echo args.
+  // BV-V8-01: git category false positives - patterns match inside echo args.
   // `echo "git reset --hard"` triggers git-reset deny even though no reset runs.
   // -------------------------------------------------------------------------
   {
@@ -52,7 +52,7 @@ module.exports = [
   // Note: guardrailsConfig tests use the tmpDir as cwd (set by run-tests harness).
   // File paths must therefore be relative (resolved against tmpDir by the script).
   {
-    description: 'BV-V8-02a: protected_files [null, deny rule] — null must not crash, deny rule applies',
+    description: 'BV-V8-02a: protected_files [null, deny rule] - null must not crash, deny rule applies',
     expect: 'deny',
     guardrailsConfig: {
       protected_files: [null, { glob: '.env', decision: 'deny' }],

@@ -139,7 +139,7 @@ then ask the user to run: ! git commit -m "<message>"`,
       /git\s+(?:\S+\s+)*clean\b/i,
       // worktree remove/prune delete the worktree directory and can lose uncommitted work
       /git\s+(?:\S+\s+)*worktree\s+(?:remove|prune)\b/i,
-      // history rewrite — more destructive than git reset (all branches/refs affected).
+      // history rewrite - more destructive than git reset (all branches/refs affected).
       // filter-branch: rewrites arbitrary commits; filter-repo: modern replacement, same risk.
       /git\s+(?:\S+\s+)*filter-branch\b/i,
       /git\s+(?:\S+\s+)*filter-repo\b/i,
@@ -245,18 +245,18 @@ is fully merged or no longer needed), then ask the user to run:
       /\bxargs\b(?:\s+-\S+)*\s+\\?(?:rm|unlink)\b/,
       // bash/sh -c "rm ..." - rm inside a -c argument
       /\b(?:ba)?sh\s+(?:\S+\s+)*-c\s+['"]?[^'"]*\brm\b/i,
-      // find -exec rm / find -execdir rm — rm as argument to find's -exec flag.
+      // find -exec rm / find -execdir rm - rm as argument to find's -exec flag.
       // Allow an optional absolute path prefix before rm (/bin/rm, /usr/bin/rm).
       /\bfind\b[^|&;]*-exec(?:dir)?\s+(?:[^\s|&;]*\/)?\\?rm\b/i,
-      // find -delete — find's built-in deletion flag, no rm invocation needed.
+      // find -delete - find's built-in deletion flag, no rm invocation needed.
       // Require command-position anchor so that "some-tool find-artifacts --delete-orphans"
       // does not fire: (1) `find` must appear as a command token, and (2) `-delete` must
       // be a standalone flag (not part of `--delete-*` compound flags).
       /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:sudo\s+)?find\b[^|&;]*\s-delete\b(?!-)/i,
-      // shred — secure overwrite/delete, bypasses rm if not explicitly caught.
+      // shred - secure overwrite/delete, bypasses rm if not explicitly caught.
       // Require command-position to avoid false positives in arguments.
       /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:sudo\s+)?shred\b/,
-      // unlink — POSIX single-file deletion (unlink(2) syscall). No flags.
+      // unlink - POSIX single-file deletion (unlink(2) syscall). No flags.
       // Require command-position anchor to avoid false positives.
       /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:sudo\s+)?unlink\b/,
       // Windows
@@ -299,7 +299,7 @@ why the file must be deleted, then ask the user to run:
       /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:sudo\s+)?ln\b/,
       // Windows mklink (creates symbolic, hard, or junction links).
       /\bmklink\b/i,
-      // PowerShell New-Item with link types — accept both -ItemType and its
+      // PowerShell New-Item with link types - accept both -ItemType and its
       // -Type alias (PowerShell 5.0+).
       /New-Item\b[^|;&]*-(?:ItemType|Type)\s+(?:SymbolicLink|HardLink|Junction)\b/i,
     ],
@@ -318,10 +318,10 @@ operations (cp, mv) over linking.`,
     description: 'Process kill',
     defaultDecision: 'ask',
     patterns: [
-      // Unix — numeric signal forms
+      // Unix - numeric signal forms
       /\bkill\s+-\d+/,
       /\bkill\s+\d+/,
-      // Unix — signal-name forms: kill -TERM, kill -KILL, kill -SIGTERM, etc.
+      // Unix - signal-name forms: kill -TERM, kill -KILL, kill -SIGTERM, etc.
       /\bkill\s+-(?:SIG)?(?:TERM|KILL|HUP|INT|QUIT|ABRT|STOP|USR[12]|CONT|ALRM|PIPE|CHLD|SEGV|TSTP)\b/i,
       /\bpkill\b/i,
       /\bkillall\b/i,
@@ -491,7 +491,7 @@ If this is truly necessary, ask the user to run the command directly:
       // exec with any argument; require command-position separator to avoid
       // false positives like `echo "exec done"`. Exclude shell fd redirections.
       // Also covers `builtin exec` and `command exec` (bypass attempts using bash
-      // built-in resolution bypass keywords — both forms replace the current shell).
+      // built-in resolution bypass keywords - both forms replace the current shell).
       /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*(?:(?:builtin|command)\s+)?exec\s+(?![\d<>])\S/i,
       // echo/printf piped to a shell interpreter through any number of intermediates.
       // Covers: direct (`echo x | sh`), one-hop (`echo x | tee f | sh`), N-hop, etc.
@@ -502,18 +502,18 @@ If this is truly necessary, ask the user to run the command directly:
       /\b(?:echo|printf|print)\b[^|&;]*(?:\|[^|&;]*)*\|\s*(?:[^\s|&;]*\/)?(?:env\s+(?:\S+\s+)*)?(?:(?:ba|z|da|k)?sh|fish)\b/i,
       /\b(?:echo|printf|print)\b[^|&;]*(?:\|[^|&;]*)*\|\s*xargs\b[^|&;]*(?:(?:ba|z|da|k)?sh|fish)\b/i,
       // source / dot-source from absolute non-project paths:
-      //   /tmp/, /dev/, /proc/, /sys/ — common piped-payload paths
-      //   ~/  — home-relative scripts outside the project
-      //   /etc/, /usr/, /opt/, /home/, /root/ — system/user paths
-      // Relative paths (./foo, ../foo, plain name) are allowed — they reference
+      //   /tmp/, /dev/, /proc/, /sys/ - common piped-payload paths
+      //   ~/  - home-relative scripts outside the project
+      //   /etc/, /usr/, /opt/, /home/, /root/ - system/user paths
+      // Relative paths (./foo, ../foo, plain name) are allowed - they reference
       // project files and are safe to source for local tooling (e.g. `source .env`).
       // Uses stripped (via lambda) so echo "source /tmp/..." doesn't false-fire.
       // The eval category normally uses testCmd=command (because patterns[0] is a
-      // function). Source/dot patterns don't need the original — they work on stripped.
+      // function). Source/dot patterns don't need the original - they work on stripped.
       (_cmd, stripped) => /\bsource\s+(?:\/(?:tmp|dev|proc|sys|etc|usr|opt|home|root|var|run)\b|~\/|\$(?:\{(?:HOME|USERPROFILE)\}|HOME|USERPROFILE)(?:\/|$))/i.test(stripped),
       (_cmd, stripped) => /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({"'])\s*\.\s+(?:\/(?:tmp|dev|proc|sys|etc|usr|opt|home|root|var|run)\b|~\/|\$(?:\{(?:HOME|USERPROFILE)\}|HOME|USERPROFILE)(?:\/|$))/i.test(stripped),
       // source/dot with process substitution <(cmd): the runtime path is a /dev/fd/N
-      // descriptor, but the literal <( is the tell — any sourced process substitution
+      // descriptor, but the literal <( is the tell - any sourced process substitution
       // executes dynamic content and must be blocked.
       (_cmd, stripped) => /\bsource\s+<\(/i.test(stripped),
       (_cmd, stripped) => /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({"'])\s*\.\s+<\(/i.test(stripped),
@@ -537,11 +537,11 @@ Use these alternatives instead:
     description: 'Persistence via scheduling',
     defaultDecision: 'deny',
     patterns: [
-      // crontab — block edit/replace/remove flags, file-argument, and stdin-redirect forms.
+      // crontab - block edit/replace/remove flags, file-argument, and stdin-redirect forms.
       // Allow read-only -l (listing). `crontab file` and `crontab < file` replace the crontab.
       /crontab\s+-(?!l\b)/i,
       /crontab\s+[^-\s]/i,
-      // `at` scheduler — numeric times, named times, and POSIX -t form.
+      // `at` scheduler - numeric times, named times, and POSIX -t form.
       /\bat\s+now\b/i,
       /\bat\s+\d/i,
       /\bat\s+(?:midnight|noon|teatime|tomorrow|next)\b/i,
@@ -670,13 +670,13 @@ This action may result in:
       /export\b[^|&;\n\r]*\bDYLD_INSERT_LIBRARIES=/i,
       // declare/typeset -x: bash/ksh equivalents to `export VAR=`. Require the -x flag
       // because declare/typeset without -x sets a shell-local variable that is never
-      // exported to child processes — no preload risk without export semantics.
+      // exported to child processes - no preload risk without export semantics.
       /(?:declare|typeset)\b[^|&;\n\r]*-[a-zA-Z]*x[a-zA-Z]*[^|&;\n\r]*\bLD_PRELOAD=/i,
       /(?:declare|typeset)\b[^|&;\n\r]*-[a-zA-Z]*x[a-zA-Z]*[^|&;\n\r]*\bLD_LIBRARY_PATH=/i,
       /(?:declare|typeset)\b[^|&;\n\r]*-[a-zA-Z]*x[a-zA-Z]*[^|&;\n\r]*\bDYLD_INSERT_LIBRARIES=/i,
       // declare/typeset -x PATH= (same three forms as export PATH=)
       /(?:declare|typeset)\s+(?:\S+\s+)*-[a-zA-Z]*x[a-zA-Z]*\s+PATH=\./i,
-      // PATH assignment — check EVERY colon-delimited segment for writable dirs.
+      // PATH assignment - check EVERY colon-delimited segment for writable dirs.
       // Uses stripped (second arg, echo-args removed) so `echo "export PATH=/tmp:$PATH"`
       // doesn't false-fire. Strip outer quotes from the captured value before splitting
       // so that `export PATH="/tmp/evil:$PATH"` (quoted) is treated the same as unquoted.
@@ -693,7 +693,7 @@ This action may result in:
         }
         return false;
       },
-      // env VAR=val cmd — POSIX env(1) command form. Distinct from BV-NEW-03 (inline
+      // env VAR=val cmd - POSIX env(1) command form. Distinct from BV-NEW-03 (inline
       // assignment without keyword). Requires command-position anchor to avoid false
       // positives inside echo strings.
       /(?:^|&&|\|\||\||;|`|\$\(|[\n\r({])\s*env\b[^|&;]*\bLD_PRELOAD=/i,
@@ -762,7 +762,7 @@ Python is not accepted on this machine. Use Node.js alternatives instead:
 // This mirrors the agent-browser eval strip in the eval category.
 //
 // IMPORTANT: Only strip args that contain NO command substitution `$(` or backtick.
-// `echo "$(rm -rf x)"` contains a real command inside the quote — stripping it would
+// `echo "$(rm -rf x)"` contains a real command inside the quote - stripping it would
 // hide the rm from category detection. Keep these args intact so categories can fire.
 // The false-positive concern only applies to pure-literal strings.
 function stripEchoArgs(cmd) {

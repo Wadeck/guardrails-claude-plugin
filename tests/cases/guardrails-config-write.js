@@ -5,7 +5,7 @@
 //
 // Default is 'deny'. Reason: Claude Code silently auto-approves
 // permissionDecision "ask" for any path under the project's .claude/ directory
-// (validated 2026-06-21). Therefore 'ask' provides no real protection here —
+// (validated 2026-06-21). Therefore 'ask' provides no real protection here -
 // only 'deny' does. Users can override to 'ask' or 'allow' in guardrails.json.
 
 const CWD = 'C:\\Workspace\\myproject';
@@ -129,7 +129,7 @@ module.exports = [
 
   // ---------------------------------------------------------------------------
   // .claude/memory/ write protection
-  // Default: 'ask' — prefer .claude/docs/ + CLAUDE.md reference instead
+  // Default: 'ask' - prefer .claude/docs/ + CLAUDE.md reference instead
   // ---------------------------------------------------------------------------
 
   {
@@ -211,7 +211,7 @@ module.exports = [
   },
 
   // ---------------------------------------------------------------------------
-  // fleet-config-write protection (default: 'deny' — see fleet-config-write.js)
+  // fleet-config-write protection (default: 'deny' - see fleet-config-write.js)
   // ---------------------------------------------------------------------------
 
   {

@@ -71,7 +71,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V21-05 [MEDIUM]: source /var/tmp/evil.sh not blocked — /var and /run missing.
+  // BV-V21-05 [MEDIUM]: source /var/tmp/evil.sh not blocked - /var and /run missing.
   // Fix: add var and run to the blocked path prefix alternation.
   // -------------------------------------------------------------------------
   {

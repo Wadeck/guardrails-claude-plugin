@@ -1,6 +1,6 @@
 'use strict';
 
-// V7 audit bypass vectors — ALL expected to return 'deny' (or 'allow' for false-positive tests).
+// V7 audit bypass vectors - ALL expected to return 'deny' (or 'allow' for false-positive tests).
 
 const CWD = 'C:\\Workspace\\myproject';
 
@@ -12,22 +12,22 @@ module.exports = [
 
   // -------------------------------------------------------------------------
   // BV-V7-01: Shell glob expansion bypasses checkSettingsWrite exact-match.
-  // `echo x > .claude/settings*` — redirect extractor captures `.claude/settings*`
+  // `echo x > .claude/settings*` - redirect extractor captures `.claude/settings*`
   // literally; checkSettingsWrite compares rel='settings*' against exact entries
-  // ('settings.json', etc.) — no match → allow.
+  // ('settings.json', etc.) - no match → allow.
   // -------------------------------------------------------------------------
   {
-    description: 'BV-V7-01a: echo x > .claude/settings* — glob bypasses settings-write',
+    description: 'BV-V7-01a: echo x > .claude/settings* - glob bypasses settings-write',
     expect: 'deny',
     event: bash('echo x > .claude/settings*'),
   },
   {
-    description: 'BV-V7-01b: echo x > .claude/hooks* — glob bypasses hooks/ prefix check',
+    description: 'BV-V7-01b: echo x > .claude/hooks* - glob bypasses hooks/ prefix check',
     expect: 'deny',
     event: bash('echo x > .claude/hooks*'),
   },
   {
-    description: 'BV-V7-01c: echo x > .claude/claude* — glob bypasses claude.md check',
+    description: 'BV-V7-01c: echo x > .claude/claude* - glob bypasses claude.md check',
     expect: 'deny',
     event: bash('echo x > .claude/claude*'),
   },
@@ -78,17 +78,17 @@ module.exports = [
   // shred overwrites then unlinks; no pattern in categories.js, no extractor.
   // -------------------------------------------------------------------------
   {
-    description: 'BV-V7-03a: shred -u .claude/settings.json — secure delete bypasses rm category',
+    description: 'BV-V7-03a: shred -u .claude/settings.json - secure delete bypasses rm category',
     expect: 'deny',
     event: bash('shred -u .claude/settings.json'),
   },
   {
-    description: 'BV-V7-03b: shred -u -z .claude/guardrails.json — secure delete with zero-fill',
+    description: 'BV-V7-03b: shred -u -z .claude/guardrails.json - secure delete with zero-fill',
     expect: 'deny',
     event: bash('shred -u -z .claude/guardrails.json'),
   },
   {
-    description: 'BV-V7-03c: shred /tmp/x — outside .claude/, still deny (rm-equivalent destructive op)',
+    description: 'BV-V7-03c: shred /tmp/x - outside .claude/, still deny (rm-equivalent destructive op)',
     expect: 'deny',
     event: bash('shred /tmp/x'),
   },
@@ -120,17 +120,17 @@ module.exports = [
   // The log-clear pattern requires /log/ paths; plain .claude/ path passes.
   // -------------------------------------------------------------------------
   {
-    description: 'BV-V7-06a: truncate -s 0 .claude/settings.json — truncate not detected',
+    description: 'BV-V7-06a: truncate -s 0 .claude/settings.json - truncate not detected',
     expect: 'deny',
     event: bash('truncate -s 0 .claude/settings.json'),
   },
   {
-    description: 'BV-V7-06b: truncate --size=0 .claude/guardrails.json — long-form flag',
+    description: 'BV-V7-06b: truncate --size=0 .claude/guardrails.json - long-form flag',
     expect: 'deny',
     event: bash('truncate --size=0 .claude/guardrails.json'),
   },
   {
-    description: 'BV-V7-06c: truncate --size=0 .claude/hooks/evil.sh — long-form, hooks dir',
+    description: 'BV-V7-06c: truncate --size=0 .claude/hooks/evil.sh - long-form, hooks dir',
     expect: 'deny',
     event: bash('truncate --size=0 .claude/hooks/evil.sh'),
   },

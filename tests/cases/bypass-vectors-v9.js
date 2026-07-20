@@ -64,7 +64,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V9-03: source <(cmd) — process substitution bypasses source pattern.
+  // BV-V9-03: source <(cmd) - process substitution bypasses source pattern.
   // The argument starts with <( not /, so no absolute-path match triggers.
   // -------------------------------------------------------------------------
   {

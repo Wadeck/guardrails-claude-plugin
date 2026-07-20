@@ -8,7 +8,7 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V16-01: install -t <dir> — destination is the -t value, not a positional arg.
+  // BV-V16-01: install -t <dir> - destination is the -t value, not a positional arg.
   // The install extractor skips -t and its value (in -(m|o|g|t) skip-arg set).
   // Only positional args are pushed, and with -t there is only 1 positional (the source).
   // Fix: capture the -t value and push it as the destination.
@@ -30,7 +30,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V16-02: awk -f scriptfile -i inplace file — -f before -i inplace.
+  // BV-V16-02: awk -f scriptfile -i inplace file - -f before -i inplace.
   // When -f scriptfile appears before -i inplace, droppedInplace is false
   // when scriptfile is seen → loop skips it (continue). After -i inplace is
   // consumed, the first non-flag is the target file but droppedScript=false
@@ -49,7 +49,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V16-03: git push -u origin :branch — flag between push and remote fills \S+.
+  // BV-V16-03: git push -u origin :branch - flag between push and remote fills \S+.
   // Pattern `push\s+\S+\s+:[^\s]` expects exactly ONE token before :refspec.
   // With -u, that slot is taken, leaving "origin" where ":" is expected → no match.
   // Fix: change to `push\s+(?:\S+\s+)+:[^\s]` (one or more tokens).
@@ -66,7 +66,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V16-04: print "..." | sh — print is in stripEchoArgs but NOT in the
+  // BV-V16-04: print "..." | sh - print is in stripEchoArgs but NOT in the
   // eval pipe-to-shell regex. Stripped form loses the dangerous content; original
   // doesn't match `\b(?:echo|printf)\b`.
   // Fix: add `print` to the pipe-to-shell pattern.
@@ -83,7 +83,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V16-05: env -i rm -rf path — env prefix requires =, not flags.
+  // BV-V16-05: env -i rm -rf path - env prefix requires =, not flags.
   // Pattern `(?:env\s+\S+=\S+\s+)*` matches only VAR=val forms, not `env -i`.
   // The rm category does not fire; path checks still protect .claude/ paths.
   // Fix: change env prefix to `(?:env\s+(?:\S+\s+)*)?` to absorb arbitrary flags.

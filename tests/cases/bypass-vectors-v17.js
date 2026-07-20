@@ -12,7 +12,7 @@ module.exports = [
   // BV-V17-01: install --target-directory DIR (space form, not =).
   // The extractor only handles `--target-directory=VALUE`. With a space, the
   // flag hits the bare `continue`, and the first positional is the source.
-  // Fix: treat `--target-directory` (exact tok) same as `-t` — consume next.
+  // Fix: treat `--target-directory` (exact tok) same as `-t` - consume next.
   // -------------------------------------------------------------------------
   {
     description: 'BV-V17-01a: install --target-directory .claude/hooks/ payload.sh → deny',
@@ -26,7 +26,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V17-02: export multi-assignment — dangerous var after innocuous one.
+  // BV-V17-02: export multi-assignment - dangerous var after innocuous one.
   // `/export\s+LD_PRELOAD=/i` requires LD_PRELOAD immediately after `export\s+`.
   // `export DUMMY=1 LD_PRELOAD=/tmp/evil.so` inserts DUMMY=1 first → no match.
   // Fix: use `(?:export|declare|typeset)\b[^|&;\n\r]*\bLD_PRELOAD=` etc.
@@ -53,10 +53,10 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V17-03: awk '{inline}' -i inplace file — script BEFORE -i inplace.
+  // BV-V17-03: awk '{inline}' -i inplace file - script BEFORE -i inplace.
   // The extractor skips tokens seen before droppedInplace=true. After -i inplace,
   // the first non-flag gets droppedScript=true and is skipped as the inline
-  // script. But the actual script was already seen — the file is the remaining
+  // script. But the actual script was already seen - the file is the remaining
   // token which is incorrectly treated as script.
   // Fix: two-pass or pre-inplace non-flag collection.
   // -------------------------------------------------------------------------

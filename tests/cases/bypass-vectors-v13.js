@@ -8,7 +8,7 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V13-01: declare/typeset -x PATH= — equivalent to `export PATH=`.
+  // BV-V13-01: declare/typeset -x PATH= - equivalent to `export PATH=`.
   // V10 added declare/typeset for LD_PRELOAD etc. but PATH was missed.
   // -------------------------------------------------------------------------
   {
@@ -29,7 +29,7 @@ module.exports = [
 
   // -------------------------------------------------------------------------
   // BV-V13-02: Dangerous dir in non-first PATH segment.
-  // Pattern [^:]* stops at first colon — /safe:/tmp/evil:$PATH bypasses.
+  // Pattern [^:]* stops at first colon - /safe:/tmp/evil:$PATH bypasses.
   // Fix: use a function pattern that splits on : and checks each segment.
   // -------------------------------------------------------------------------
   {
@@ -49,7 +49,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V13-03: crontab <file> (no flag) — replaces entire crontab.
+  // BV-V13-03: crontab <file> (no flag) - replaces entire crontab.
   // Current pattern requires `-` flag: /crontab\s+-(?!l\b)/
   // -------------------------------------------------------------------------
   {
@@ -79,7 +79,7 @@ module.exports = [
 
   // -------------------------------------------------------------------------
   // BV-V13-05: iptables/ip6tables with intervening flags before -F/-D.
-  // Pattern requires -F immediately after iptables — -v or -t table inserts.
+  // Pattern requires -F immediately after iptables - -v or -t table inserts.
   // -------------------------------------------------------------------------
   {
     description: 'BV-V13-05a: iptables -v -F → deny',
@@ -134,7 +134,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V13-08: find -exec rm — rm as -exec argument, not at command-position.
+  // BV-V13-08: find -exec rm - rm as -exec argument, not at command-position.
   // All rm patterns require a command-position separator before rm.
   // -------------------------------------------------------------------------
   {

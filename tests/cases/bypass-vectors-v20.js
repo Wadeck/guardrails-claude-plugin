@@ -9,7 +9,7 @@ module.exports = [
 
   // -------------------------------------------------------------------------
   // BV-V20-01 [HIGH]: `unlink` not in rm category or extractBashWritePaths.
-  // `unlink FILE` deletes a single file — equivalent to `rm` for the agent.
+  // `unlink FILE` deletes a single file - equivalent to `rm` for the agent.
   // Fix: add unlink to rm patterns (command-position anchor) + path extractor.
   // -------------------------------------------------------------------------
   {

@@ -8,10 +8,10 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V12-01: sponge inside process substitution — trailing ) not stripped.
+  // BV-V12-01: sponge inside process substitution - trailing ) not stripped.
   // The bare sponge extractor captures "settings.json)" because sponge is
   // inside >(sponge ...) and the ) is not in the exclusion set.
-  // V10 fixed tee the same way — apply the same strip to sponge.
+  // V10 fixed tee the same way - apply the same strip to sponge.
   // -------------------------------------------------------------------------
   {
     description: 'BV-V12-01a: echo "{}" > >(sponge .claude/settings.json) → deny',
@@ -25,7 +25,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V12-02: env PATH=... — env command form not covered for PATH injection.
+  // BV-V12-02: env PATH=... - env command form not covered for PATH injection.
   // V11 added env LD_PRELOAD= patterns but not PATH=.
   // -------------------------------------------------------------------------
   {
@@ -67,7 +67,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V12-04: Multi-source cp — third+ token is destination, extractor captures second.
+  // BV-V12-04: Multi-source cp - third+ token is destination, extractor captures second.
   // cp src1 src2 dst: extractor regex takes \S+\s+(\S+) after flags, capturing src2.
   // dst (.claude/settings.json) is never extracted → settings-write misses.
   // Fix: also push the last non-flag token from the argument segment.

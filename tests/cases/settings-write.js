@@ -13,7 +13,7 @@ const CWD = 'C:\\Workspace\\myproject';
 const proj = (rel) => `${CWD}\\${rel.replace(/\//g, '\\')}`;
 
 module.exports = [
-  // --- Default: deny — settings & hooks & skills & CLAUDE.md ---
+  // --- Default: deny - settings & hooks & skills & CLAUDE.md ---
   {
     description: 'Write .claude/settings.json → deny by default',
     expect: 'deny',
@@ -127,7 +127,7 @@ module.exports = [
 
   // --- Files NOT covered (other rules apply or none) ---
   {
-    description: 'Write .claude/docs/ (still allowed — docs are user-writable)',
+    description: 'Write .claude/docs/ (still allowed - docs are user-writable)',
     expect: 'allow',
     event: {
       tool_name: 'Write',

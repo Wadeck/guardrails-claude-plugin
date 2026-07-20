@@ -197,7 +197,7 @@ module.exports = [
     },
   },
 
-  // --- v5 audit: getTargetPaths shapes — uri form, object-array files ---
+  // --- v5 audit: getTargetPaths shapes - uri form, object-array files ---
   {
     description: 'mcp__lsp__write with file:// URI → deny',
     expect: 'deny',

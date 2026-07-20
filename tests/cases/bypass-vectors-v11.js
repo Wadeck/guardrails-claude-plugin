@@ -8,7 +8,7 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V11-01: Three-pipe eval — echo through TWO intermediates then shell.
+  // BV-V11-01: Three-pipe eval - echo through TWO intermediates then shell.
   // V10 one-intermediate pattern stops at (echo | X | shell). Two intermediates
   // (echo | X | Y | shell) slip past because the second [^|&;]* matches "Y"
   // and the final \|\s*shell never gets a chance to see the last pipe.
@@ -47,9 +47,9 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V11-03: sponge (moreutils) — not in extractBashWritePaths.
+  // BV-V11-03: sponge (moreutils) - not in extractBashWritePaths.
   // sponge reads all stdin then atomically writes to the named file.
-  // No redirect, no tee, no category match — all checks see empty targetPaths.
+  // No redirect, no tee, no category match - all checks see empty targetPaths.
   // -------------------------------------------------------------------------
   {
     description: 'BV-V11-03a: printf "{}" | sponge .claude/settings.json → deny',
@@ -68,7 +68,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V11-04a: export PATH=$HOME/... and /home/user/... — not in PATH pattern.
+  // BV-V11-04a: export PATH=$HOME/... and /home/user/... - not in PATH pattern.
   // V10 pattern only blocks /tmp, /dev/shm, /var/tmp, and literal ~/. $HOME and
   // /home/user/ are user-writable and not covered.
   // -------------------------------------------------------------------------
@@ -85,7 +85,7 @@ module.exports = [
 
   // -------------------------------------------------------------------------
   // BV-V11-04b: export PATH=/tmp (pure replacement, no trailing colon).
-  // V10 pattern: [^:]*(\/tmp)[^:]*: — requires a colon after the dir.
+  // V10 pattern: [^:]*(\/tmp)[^:]*: - requires a colon after the dir.
   // Pure replacement (no $PATH appended) bypasses because there is no colon.
   // -------------------------------------------------------------------------
   {
@@ -100,7 +100,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V11-05: env LD_PRELOAD=... cmd — env(1) form not in env-hijack.
+  // BV-V11-05: env LD_PRELOAD=... cmd - env(1) form not in env-hijack.
   // Distinct from BV-NEW-03 (inline without keyword). env command prefix is a
   // POSIX standard form not requiring any shell keyword.
   // -------------------------------------------------------------------------

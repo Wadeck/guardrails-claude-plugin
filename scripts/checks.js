@@ -12,7 +12,7 @@ const DECISION_RANK = { deny: 2, ask: 1, allow: 0 };
 
 function resolveDecision(configCategories, name, defaultVal) {
   // Defense-in-depth: a malformed config (non-object categories, non-string
-  // values) MUST NOT throw — an unhandled exception bubbles up to the hook's
+  // values) MUST NOT throw - an unhandled exception bubbles up to the hook's
   // catch handler, which exits with empty stdout, which Claude Code interprets
   // as "allow". Fall back to defaultVal for any non-string value.
   const cats = (configCategories && typeof configCategories === 'object') ? configCategories : {};
@@ -74,12 +74,12 @@ function checkGuardrailsConfigWrite(targetPaths, config, event, projectDir) {
   const protLit  = normPathLiteral(guardrailsConfigPath);
 
   for (const targetPath of targetPaths) {
-    // Test both realpath-resolved AND literal — symlink defense.
+    // Test both realpath-resolved AND literal - symlink defense.
     const targetNorm = normPath(targetPath, projectDir);
     const targetLit  = normPathLiteral(targetPath, projectDir);
     if (targetNorm !== protNorm && targetLit !== protLit) continue;
 
-    // Default 'deny' — Claude Code silently auto-approves 'ask' for any path
+    // Default 'deny' - Claude Code silently auto-approves 'ask' for any path
     // under .claude/ (no PermissionRequest event emitted; validated 2026-06-21).
     // 'ask' offers no real protection here. See README "Notes for agents".
     const decision = resolveDecision(config.categories, 'guardrails-config-write', 'deny');
@@ -138,12 +138,12 @@ function checkFleetConfigWrite(targetPaths, config, event, projectDir) {
   const protLit  = normPathLiteral(fleetConfigPath);
 
   for (const targetPath of targetPaths) {
-    // Test both realpath-resolved AND literal — symlink defense.
+    // Test both realpath-resolved AND literal - symlink defense.
     const targetNorm = normPath(targetPath, projectDir);
     const targetLit  = normPathLiteral(targetPath, projectDir);
     if (targetNorm !== protNorm && targetLit !== protLit) continue;
 
-    // Default 'deny' — see checkGuardrailsConfigWrite comment.
+    // Default 'deny' - see checkGuardrailsConfigWrite comment.
     const decision = resolveDecision(config.categories, 'fleet-config-write', 'deny');
     if (decision === 'allow') continue;
 
@@ -194,7 +194,7 @@ function checkFleetConfigWrite(targetPaths, config, event, projectDir) {
 
 function checkSettingsWrite(targetPaths, config, projectDir) {
   // Protect Claude Code's own configuration files inside .claude/.
-  // Default 'deny' — Claude Code silently auto-approves 'ask' for any path
+  // Default 'deny' - Claude Code silently auto-approves 'ask' for any path
   // under .claude/ (validated 2026-06-21). Writing settings.json with
   // {"hooks":{}} would disable all hook-based guardrails. CLAUDE.md and
   // skills/ are also project-level instructions an agent must not rewrite.
@@ -232,7 +232,7 @@ function checkSettingsWrite(targetPaths, config, projectDir) {
       const claudePrefix = norm.startsWith(claudeNorm + '/') || norm.startsWith(claudeNormLit + '/');
       if (!claudeRoot && !claudePrefix) continue;
       if (claudeRoot) {
-        matched = '.claude/ (directory write — could place protected files inside)';
+        matched = '.claude/ (directory write - could place protected files inside)';
         isClaudeRoot = true;
         break;
       }
@@ -245,7 +245,7 @@ function checkSettingsWrite(targetPaths, config, projectDir) {
       for (const p of protectedRels) {
         if (p.endsWith('/')) {
           if (rel === p.slice(0, -1) || rel.startsWith(p)) { matched = p; break; }
-          // Shell glob: `hooks*` — glob prefix 'hooks' is a prefix of 'hooks/' → deny.
+          // Shell glob: `hooks*` - glob prefix 'hooks' is a prefix of 'hooks/' → deny.
           if (hasGlob && (p.slice(0, -1).startsWith(globPrefix) || p.startsWith(globPrefix))) {
             matched = p; break;
           }
@@ -254,7 +254,7 @@ function checkSettingsWrite(targetPaths, config, projectDir) {
         } else if (hasGlob) {
           // Shell glob in the path (e.g. `.claude/settings*`): if the glob
           // prefix (up to first wildcard) is a prefix of a protected entry,
-          // deny conservatively — the shell may expand it to the protected file.
+          // deny conservatively - the shell may expand it to the protected file.
           if (p.startsWith(globPrefix)) { matched = p; break; }
         }
       }
@@ -300,7 +300,7 @@ function checkMemoryWrite(targetPaths, config, projectDir) {
   const memNormLit = normPathLiteral(projectMemoryDirPath);
 
   for (const targetPath of targetPaths) {
-    // Test both realpath-resolved AND literal — symlink defense (see settings).
+    // Test both realpath-resolved AND literal - symlink defense (see settings).
     const norm = normPath(targetPath, projectDir);
     const normLit = normPathLiteral(targetPath, projectDir);
     const inside =
@@ -308,7 +308,7 @@ function checkMemoryWrite(targetPaths, config, projectDir) {
       normLit.startsWith(memNormLit + '/') || normLit === memNormLit;
     if (!inside) continue;
 
-    // Default 'deny' — Claude Code silently auto-approves 'ask' for any path
+    // Default 'deny' - Claude Code silently auto-approves 'ask' for any path
     // under .claude/ (no PermissionRequest event emitted; validated 2026-06-21),
     // so 'ask' provides zero protection in this scope. See README "Notes for agents".
     const decision = resolveDecision(config.categories, 'memory-write', 'deny');
@@ -347,17 +347,17 @@ function checkMemoryWrite(targetPaths, config, projectDir) {
 }
 
 function checkSecretsFileWrite(targetPaths, config, projectDir) {
-  const protected_ = collectProtectedSecretPaths(projectDir, config);
+  const protectedPaths = collectProtectedSecretPaths(projectDir, config);
 
   for (const targetPath of targetPaths) {
     // Pre-compute both forms for the target.
     const targetNorm = normPath(targetPath, projectDir);
     const targetLit  = normPathLiteral(targetPath, projectDir);
-    for (const p of protected_) {
+    for (const p of protectedPaths) {
       // Symlink defense: match on either resolved or literal form.
       if (targetNorm !== normPath(p) && targetLit !== normPathLiteral(p)) continue;
 
-      // Default 'deny' — see checkGuardrailsConfigWrite comment. Default secrets
+      // Default 'deny' - see checkGuardrailsConfigWrite comment. Default secrets
       // path is .claude/guardrails.secrets, where 'ask' is silently auto-approved.
       const decision = resolveDecision(config.categories, 'secrets-file-write', 'deny');
       if (decision === 'allow') continue;
@@ -489,7 +489,7 @@ function checkCategories(command, config) {
   const matches = matchCategory(command, Object.keys(CATEGORIES));
   const results = [];
   for (const matched of matches) {
-    // Defense-in-depth: same hardening as resolveDecision — non-string values
+    // Defense-in-depth: same hardening as resolveDecision - non-string values
     // must not crash the checker (silent allow). Use the resolved decision as
     // the canonical _rawDecision when the configured value is unusable.
     const cats = (config.categories && typeof config.categories === 'object') ? config.categories : {};

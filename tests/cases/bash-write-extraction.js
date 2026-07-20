@@ -28,7 +28,7 @@ module.exports = [
     expect: 'deny',
     event: bash('sed --in-place "s/x/y/" .claude/settings.json'),
   },
-  // sed -i -e variants — script supplied via -e, file is the only remaining token
+  // sed -i -e variants - script supplied via -e, file is the only remaining token
   {
     description: 'sed -i -e SCRIPT FILE → deny (audit v4 finding HIGH)',
     expect: 'deny',
@@ -133,7 +133,7 @@ module.exports = [
     event: bash('yq -i \'.foo = "bar"\' .claude/settings.json'),
   },
 
-  // --- gawk -i inplace (GNU awk binary — v5 audit MEDIUM) ---
+  // --- gawk -i inplace (GNU awk binary - v5 audit MEDIUM) ---
   {
     description: 'gawk -i inplace targeting .claude/settings.json → deny',
     expect: 'deny',

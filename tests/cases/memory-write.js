@@ -5,7 +5,7 @@
 // Default is 'deny'. Reason: Claude Code silently auto-approves
 // permissionDecision: "ask" for any path under the project's .claude/ directory
 // (no PermissionRequest event is emitted). Validated empirically 2026-06-21.
-// Therefore 'ask' provides no protection in this scope — only 'deny' does.
+// Therefore 'ask' provides no protection in this scope - only 'deny' does.
 // Projects can override to 'ask' or 'allow' explicitly in guardrails.json.
 
 const os   = require('os');

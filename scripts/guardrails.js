@@ -21,7 +21,7 @@ const MIN_B64_FINGERPRINT_LENGTH = 8;
 
 /**
  * Precomputes base64 fingerprints for a secret value, covering all 3 byte-alignment offsets
- * (0, 1, 2 mod 3) by prepending 0–3 padding bytes before encoding.
+ * (0, 1, 2 mod 3) by prepending 0-3 padding bytes before encoding.
  *
  * Why this is needed: base64 encodes groups of 3 bytes. When a secret is embedded inside a
  * longer string (e.g. "user:secret" in curl Basic auth), the secret starts at a byte offset
@@ -159,7 +159,7 @@ const SECRETS_FILE_MAX_BYTES = 10 * 1024 * 1024;
 //   1. fs.statSync to reject non-regular-files (FIFOs, devices, sockets, dirs).
 //      A FIFO with no writer would block readFileSync indefinitely; /dev/zero
 //      and /dev/urandom would read into OOM. Both have been seen in audits.
-//   2. Size cap (10 MB) — secrets files are tiny in practice.
+//   2. Size cap (10 MB) - secrets files are tiny in practice.
 //   3. Regular fs.readFileSync (after the stat passes), which is safe.
 // Returns the file content string, or null if the file is unsafe / unreadable.
 function safeReadSecretFile(filePath, onWarn) {

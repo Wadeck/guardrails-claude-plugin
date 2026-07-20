@@ -42,14 +42,14 @@ module.exports = [
     event: bash('mklink /d C:\\link C:\\target'),
   },
 
-  // --- Hard-links variant of ln (no -s) — same risk in some scenarios ---
+  // --- Hard-links variant of ln (no -s) - same risk in some scenarios ---
   {
     description: 'ln /etc/passwd .claude/hooks/x → deny (hard link)',
     expect: 'deny',
     event: bash('ln /etc/passwd .claude/hooks/x'),
   },
 
-  // --- sudo ln — must still be caught (audit v4 HIGH) ---
+  // --- sudo ln - must still be caught (audit v4 HIGH) ---
   {
     description: 'sudo ln -s /etc/passwd .claude/hooks/evil → deny',
     expect: 'deny',

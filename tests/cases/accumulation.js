@@ -1,7 +1,7 @@
 'use strict';
 
 // Cross-rule accumulation tests.
-// All rules participate in the same match pool — most restrictive wins (deny > ask),
+// All rules participate in the same match pool - most restrictive wins (deny > ask),
 // multiple ask-level matches appear together in the multi-ask dialog.
 //
 // Each case uses guardrailsConfig so the harness sets up a tmpDir as event.cwd,

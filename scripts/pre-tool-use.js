@@ -3,7 +3,7 @@
 // Module-level imports must be wrapped: a missing helper or a desync between
 // repo and cache (2026-06-21 incident) would make every require throw, locking
 // the user out of every tool in every Claude Code session. If imports fail,
-// exit 0 (allow) — the user has more pressing problems than guardrails right now.
+// exit 0 (allow) - the user has more pressing problems than guardrails right now.
 let log, loadConfig, loadSecrets, findLeakedSecret;
 let expandTilde, fromGitBash, normPath, extractBashWritePaths, getTargetPath, getTargetPaths, isWriteCapableTool;
 let checkCrossHomeWrite, checkGuardrailsConfigWrite, checkFleetConfigWrite, checkSettingsWrite,
@@ -99,7 +99,7 @@ function resolveMatches(allMatches) {
 // Set to true once we have a parsed event and know the tool is write-capable.
 // Errors AFTER this point are inside the security logic and must fail closed (deny).
 // Errors BEFORE this point (require/import errors, malformed stdin) are bugs in
-// the hook itself and must fail open (allow) — failing closed there can lock the
+// the hook itself and must fail open (allow) - failing closed there can lock the
 // user out of their entire Claude Code installation, as we learned the hard way.
 let inSecurityLogic = false;
 
@@ -170,7 +170,7 @@ async function main() {
   ).map((p) => path.isAbsolute(p) ? p : path.join(projectDir, p));
 
   // ---------------------------------------------------------------------------
-  // Run all checkers — collect every match, then resolve once.
+  // Run all checkers - collect every match, then resolve once.
   // ---------------------------------------------------------------------------
   const allMatches = [];
 
@@ -192,7 +192,7 @@ async function main() {
 
   // Bash-only rules
   if (isBash) {
-    // secrets-not-gitignored must be evaluated but its deny dominates everything —
+    // secrets-not-gitignored must be evaluated but its deny dominates everything -
     // it participates in the accumulator like any other match.
     if (leaked) log.warn(`Secret leak detected: key=${leaked.key} | cmd=<redacted>`);
 
@@ -251,7 +251,7 @@ main().catch((e) => {
   // Two-mode fail-safe:
   // - BEFORE the security logic begins (require errors, malformed stdin):
   //   fail OPEN. A bug here can lock the user out of every tool in every
-  //   Claude Code session — happened on 2026-06-21 when a stale cache lacked
+  //   Claude Code session - happened on 2026-06-21 when a stale cache lacked
   //   isWriteCapableTool and every Bash/Edit/Write call became deny.
   //   An attacker cannot influence import-time errors.
   // - AFTER inSecurityLogic = true (inside checkers, accumulator, decide):
@@ -262,7 +262,7 @@ main().catch((e) => {
     process.exit(0);
     return;
   }
-  const reason = `[guardrails] INTERNAL ERROR — fail-safe deny\n\nThe guardrail hook crashed while evaluating this tool call:\n  ${e.message}\n\nThis is a bug. Please report it. The action has been blocked as a precaution.`;
+  const reason = `[guardrails] INTERNAL ERROR - fail-safe deny\n\nThe guardrail hook crashed while evaluating this tool call:\n  ${e.message}\n\nThis is a bug. Please report it. The action has been blocked as a precaution.`;
   const output = JSON.stringify({
     hookSpecificOutput: {
       hookEventName: 'PreToolUse',

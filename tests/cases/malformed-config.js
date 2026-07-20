@@ -2,13 +2,13 @@
 
 // Defense-in-depth: a malformed guardrails.json must NEVER produce a silent
 // "allow". Bad values (non-strings, unknown strings, weird casing) must fall
-// back to the built-in default decision — and any thrown exception inside a
+// back to the built-in default decision - and any thrown exception inside a
 // checker must end with deny, not exit 0 with empty stdout.
 //
 // Why this matters: an attacker who can write guardrails.json could craft
 // values that crash the checker on .toLowerCase() and the empty stdout would
 // be interpreted by Claude Code as "allow". The previous behavior was to
-// exit 0 silently on uncaught exceptions — a guard-disabling bypass.
+// exit 0 silently on uncaught exceptions - a guard-disabling bypass.
 
 const CWD = 'C:\\Workspace\\myproject';
 
@@ -60,7 +60,7 @@ module.exports = [
     event: { tool_name: 'Bash', tool_input: { command: 'rm /tmp/x' } },
   },
 
-  // --- memory-write defaults to deny — same fallback ---
+  // --- memory-write defaults to deny - same fallback ---
   {
     description: 'memory-write set to 42 (number) → fallback deny (memory default)',
     expect: 'deny',

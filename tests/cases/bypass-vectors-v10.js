@@ -8,7 +8,7 @@ function bash(command) { return { tool_name: 'Bash', tool_input: { command }, cw
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V10-01: echo | tee | sh — tee interposed between echo and shell.
+  // BV-V10-01: echo | tee | sh - tee interposed between echo and shell.
   // Pattern requires shell immediately after first pipe; tee breaks this.
   // -------------------------------------------------------------------------
   {
@@ -23,7 +23,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V10-02: git filter-branch / git filter-repo — history rewrite.
+  // BV-V10-02: git filter-branch / git filter-repo - history rewrite.
   // More destructive than git reset; zero category coverage.
   // -------------------------------------------------------------------------
   {
@@ -54,7 +54,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V10-04: git push -fv / -fn / -fq — combined short flags bypass -f detection.
+  // BV-V10-04: git push -fv / -fn / -fq - combined short flags bypass -f detection.
   // Pattern: -f(?:\s|$) doesn't match -fv (f followed by letter, not space/EOL).
   // -------------------------------------------------------------------------
   {
@@ -145,7 +145,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V10-08: kill -TERM / -SIGTERM — signal-name forms not matched.
+  // BV-V10-08: kill -TERM / -SIGTERM - signal-name forms not matched.
   // -------------------------------------------------------------------------
   {
     description: 'BV-V10-08a: kill -TERM 1234 → ask (signal-name form)',

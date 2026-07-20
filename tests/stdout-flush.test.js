@@ -1,11 +1,11 @@
 'use strict';
 
 // stdout-flush: verify that the hook's JSON response is received by the pipe
-// BEFORE process.exit(0) closes it — for every decision type.
+// BEFORE process.exit(0) closes it - for every decision type.
 //
 // The race condition: process.stdout.write() is async on piped streams.
 // If process.exit(0) fires before the kernel flushes the buffer, Claude Code
-// receives an empty pipe and treats it as "allow" — silently bypassing ask/deny.
+// receives an empty pipe and treats it as "allow" - silently bypassing ask/deny.
 //
 // This test uses spawn() (not spawnSync) to observe data vs close events in
 // real time. If 'data' always arrives before 'close', the flush is safe.
@@ -75,7 +75,7 @@ async function main() {
   let totalFailed = 0;
   let totalPassed = 0;
 
-  console.log('stdout-flush test — race condition detection');
+  console.log('stdout-flush test - race condition detection');
   console.log(`Running ${N_RUNS} iterations per case\n`);
 
   for (const { label, event, expectDecision } of CASES) {
@@ -104,11 +104,11 @@ async function main() {
         console.log(`      wrong decision: ${wrongDecision}/${N_RUNS} (expected ${expectDecision})`);
     } else {
       totalPassed++;
-      console.log(`  ✓ ${label} — ${N_RUNS}/${N_RUNS} runs: data always before close`);
+      console.log(`  ✓ ${label} - ${N_RUNS}/${N_RUNS} runs: data always before close`);
     }
   }
 
-  console.log(`\n${totalFailed === 0 ? '✓ All' : '✗'} ${totalPassed + totalFailed} flush tests ${totalFailed === 0 ? 'passed' : `— ${totalFailed} FAILED`}`);
+  console.log(`\n${totalFailed === 0 ? '✓ All' : '✗'} ${totalPassed + totalFailed} flush tests ${totalFailed === 0 ? 'passed' : `- ${totalFailed} FAILED`}`);
   process.exit(totalFailed > 0 ? 1 : 0);
 }
 

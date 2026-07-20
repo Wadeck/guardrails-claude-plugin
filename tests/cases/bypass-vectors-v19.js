@@ -9,7 +9,7 @@ function mcp(toolName, toolInput) { return { tool_name: toolName, tool_input: to
 module.exports = [
 
   // -------------------------------------------------------------------------
-  // BV-V19-01 [HIGH]: tar --directory long form — only -C is extracted.
+  // BV-V19-01 [HIGH]: tar --directory long form - only -C is extracted.
   // Fix: add --directory=VALUE and --directory VALUE extractors.
   // -------------------------------------------------------------------------
   {
@@ -29,7 +29,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V19-02 [HIGH]: git clone — no category, no path extractor.
+  // BV-V19-02 [HIGH]: git clone - no category, no path extractor.
   // An agent can clone a malicious repo directly into .claude/hooks/.
   // Fix: add git-clone category (default ask) + path extractor.
   // -------------------------------------------------------------------------
@@ -88,7 +88,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V19-06 [MEDIUM]: patch -o FILE — no extractor for patch output.
+  // BV-V19-06 [MEDIUM]: patch -o FILE - no extractor for patch output.
   // Fix: add patch -o / --output extractor.
   // -------------------------------------------------------------------------
   {

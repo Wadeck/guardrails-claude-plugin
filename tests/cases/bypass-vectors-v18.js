@@ -10,7 +10,7 @@ module.exports = [
   // -------------------------------------------------------------------------
   // BV-V18-01 [CRITICAL]: awk -i inplace <file> with no inline script arg.
   // Two-pass extractor: all = ['.claude/settings.json'], all.slice(1) = [].
-  // Nothing pushed — path checks never fire.
+  // Nothing pushed - path checks never fire.
   // Fix: when all.length === 1 and !scriptViaF, the single token is a file, not a script.
   // -------------------------------------------------------------------------
   {
@@ -31,7 +31,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V18-02 [HIGH]: sponge -a FILE — -a flag before filename causes extractor
+  // BV-V18-02 [HIGH]: sponge -a FILE - -a flag before filename causes extractor
   // to capture `-a` as the path, actual file never pushed.
   // Fix: extend sponge extractor to skip -a / --append like tee skips -a.
   // -------------------------------------------------------------------------
@@ -47,7 +47,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V18-03 [MEDIUM]: declare LD_PRELOAD= without -x — false positive.
+  // BV-V18-03 [MEDIUM]: declare LD_PRELOAD= without -x - false positive.
   // V17 broadened declare/typeset patterns to not require -x, but declare
   // without -x sets a shell-local variable that is NOT exported to children.
   // Fix: restore -x requirement for declare/typeset; keep broad pattern only for export.
@@ -70,7 +70,7 @@ module.exports = [
   },
 
   // -------------------------------------------------------------------------
-  // BV-V18-04 [MEDIUM]: rsync --backup-dir=.claude/... — backup dir not extracted.
+  // BV-V18-04 [MEDIUM]: rsync --backup-dir=.claude/... - backup dir not extracted.
   // The rsync tokenizer filters all tokens starting with `-`, including
   // `--backup-dir=.claude/hooks/`. Only src/dst positional tokens are pushed.
   // Fix: extract --backup-dir= value and push it alongside the destination.
